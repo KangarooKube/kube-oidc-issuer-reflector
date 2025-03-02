@@ -20,9 +20,23 @@ class JsonRequestFormatter(json_log_formatter.JSONFormatter):
         extra: dict[str, str | int | float],
         record: logging.LogRecord
     ) -> dict[str, str | int | float]:
-        # Convert the log record to a JSON object.
-        # See https://docs.gunicorn.org/en/stable/settings.html#access-log-format
+        """
+        Convert a log record to a JSON object.
 
+        The access log format is specified at
+        https://docs.gunicorn.org/en/stable/settings.html#access-log-format
+
+        The output JSON object will have the following keys:
+        - remote_ip: The IP address of the client.
+        - method: The HTTP request method.
+        - path: The URL path of the request.
+        - status: The HTTP status code of the response.
+        - time: The time the request was received.
+        - user_agent: The User-Agent header of the request.
+        - referrer: The Referrer header of the request.
+        - duration_in_ms: The time taken to process the request in milliseconds.
+        - pid: The process ID of the Gunicorn worker.
+        """
         response_time = datetime.datetime.strptime(
             record.args["t"], "[%d/%b/%Y:%H:%M:%S %z]"
         )
@@ -31,7 +45,7 @@ class JsonRequestFormatter(json_log_formatter.JSONFormatter):
             url += f"?{record.args['q']}"
 
         return dict(
-            remote_ip=record.args["h"],
+            remote_ip=record.args["{X-Forwarded-For}i"],
             method=record.args["m"],
             path=url,
             status=str(record.args["s"]),
@@ -49,6 +63,10 @@ class JsonErrorFormatter(json_log_formatter.JSONFormatter):
         extra: dict[str, str | int | float],
         record: logging.LogRecord
     ) -> dict[str, str | int | float]:
+        """
+        Override the default json_record method to add the log level to the
+        error log payload.
+        """
         payload: dict[str, str | int | float] = super().json_record(
             message, extra, record
         )

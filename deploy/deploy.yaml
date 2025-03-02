@@ -3,6 +3,41 @@ kind: Namespace
 metadata:
   name: kube-oidc-issuer-reflector
 ---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: kube-oidc-issuer-reflector
+  namespace: kube-oidc-issuer-reflector
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: kube-oidc-issuer-reflector
+  namespace: kube-oidc-issuer-reflector
+rules:
+  - verbs:
+      - get
+    apiGroups:
+      - authentication.k8s.io
+    resources:
+      - oidcissuers
+      - oidcclusterissuers
+      - oidcconfigs
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: kube-oidc-issuer-reflector
+  namespace: kube-oidc-issuer-reflector
+roleRef:
+  kind: Role
+  name: kube-oidc-issuer-reflector
+  apiGroup: rbac.authorization.k8s.io
+subjects:
+  - kind: ServiceAccount
+    name: kube-oidc-issuer-reflector
+    namespace: kube-oidc-issuer-reflector
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -73,17 +108,25 @@ metadata:
 spec:
   ingressClassName: nginx
   rules:
-  - host: $ISSUER_FQDN
+  - host: $OIDC_ISSUER_FQDN
     http:
       paths:
-      - path: /
-        pathType: Prefix
-        backend:
-          service:
-            name: kube-oidc-issuer-reflector
-            port:
-              number: 80
+        - path: /.well-known/openid-configuration
+          pathType: Prefix
+          backend:
+            service:
+              name: kube-oidc-issuer-reflector
+              port:
+                number: 80
+        - path: /openid/v1/jwks
+          pathType: Prefix
+          backend:
+            service:
+              name: kube-oidc-issuer-reflector
+              port:
+                number: 80
+
   tls:
     - hosts:
-        - $ISSUER_FQDN
+        - $OIDC_ISSUER_FQDN
       secretName: kube-oidc-issuer-reflector-tls
