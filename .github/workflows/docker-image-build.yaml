@@ -52,7 +52,8 @@ jobs:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
           tags: |
             type=raw,value=latest,enable={{is_default_branch}}
-            type=raw,value=${{ steps.commit.outputs.short }}
+            type=raw,value=${{ steps.commit.outputs.short }},enable=${{ github.ref != 'refs/heads/main' }}
+            type=semver,pattern={{version}},enable={{is_default_branch}}
       
       # Install QEMU static binaries.
       - name: Set up QEMU
@@ -96,5 +97,5 @@ jobs:
         with:
           tags: ${{ steps.image-metadata.outputs.tags }}
           labels: ${{ steps.image-metadata.outputs.labels }}
-          #platforms: linux/amd64,linux/arm64
+          platforms: linux/amd64,linux/arm64
           push: true

@@ -42,6 +42,15 @@ class EndpointFilter(logging.Filter):
         self._path = path
 
     def filter(self, record: logging.LogRecord) -> bool:
+        """
+        Filter out log records that contain the specified path.
+
+        Args:
+            record (logging.LogRecord): The log record to be filtered.
+
+        Returns:
+            bool: True if the record should be processed, False otherwise.
+        """
         return record.getMessage().find(self._path) == -1
 
 
@@ -59,6 +68,12 @@ def get_exception_description(e: Exception) -> str:
     Return a string describing the exception.
 
     The string is a single line and includes the exception type and message.
+
+    Args:
+        e (Exception): The exception to be described.
+
+    Returns:
+        str: A single line string describing the exception.
     """
     exc_desc_lines = traceback.format_exception_only(type(e), e)
     exc_desc = ''.join(exc_desc_lines).rstrip()
@@ -117,31 +132,34 @@ def get_openid_configuration() -> json:
 
 # Route for JSON Web Key Sets (JWKS) document which contains the public signing key(s) for service accounts
 @app.route('/openid/v1/jwks', methods=['GET'])
-def get_jwks() -> json:
+def get_jwks() -> t.Tuple[Flask.Response, int]:
     """
     Return the JSON Web Key Sets (JWKS) document which contains the public signing key(s) for service accounts.
 
     This document is used to validate the signature of the ID Tokens issued by the cluster.
+
+    Returns:
+        Tuple[Flask.Response, int]: A tuple containing the JSON response of the JWKS document and the HTTP status code.
     """
     try:
-        k8s_client = get_k8s_client().OpenidApi()
-        api_response = k8s_client.get_service_account_issuer_open_id_keyset(_preload_content=False)
-        jwks = json.loads(api_response.data)
+        k8s_client: client.OpenidApi = get_k8s_client().OpenidApi()
+        api_response: client.ApiResponse = k8s_client.get_service_account_issuer_open_id_keyset(_preload_content=False)
+        jwks: dict = json.loads(api_response.data)
     except Exception as e:
         app.logger.error(f"kubernetes.client.OpenidApi.Exception: {e}")
         return "Internal error check logs", 500
 
-    return jsonify(jwks)
+    return jsonify(jwks), 200
 
 @app.route('/livez')
 @limiter.exempt
-def health_liveness():
+def health_liveness() -> t.Tuple[str, int]:
     """
     Kubernetes liveness probe handler.
 
     This route is used by the liveness probe to determine if the pod is healthy.
-    It returns a 200 status code if the pod is healthy, and a 500 status code
-    if the pod is not healthy.
+    It returns a tuple containing a string indicating the pod's health status and
+    an HTTP status code.
 
     The liveness probe is exempt from rate limiting so that it does not interfere
     with the pod's normal operation.
@@ -149,31 +167,36 @@ def health_liveness():
     The pod is considered healthy if the Kubernetes API server responds with
     a valid version string.
 
-    :return: A string indicating the pod's health status, along with a
-             corresponding HTTP status code.
+    Returns:
+        Tuple[str, int]: A tuple containing a string indicating the pod's health
+                         status and an HTTP status code.
     """
     try:
-        k8s_client = get_k8s_client().VersionApi()
-        api_response = k8s_client.get_code()
+        k8s_client: client.VersionApi = get_k8s_client().VersionApi()
+        api_response: client.V1Version = k8s_client.get_code()
     except Exception as e:
         app.logger.error("Health check failed!")
         app.logger.error(f"kubernetes.client.VersionApi.Exception: {e}")
         return "I am unhealthy!", 500
     
-    return f"I am healthy! Running on Kubernetes version {api_response.git_version}.", 200
+    return (
+        f"I am healthy! Running on Kubernetes version {api_response.git_version}.",
+        200,
+    )
     
 @app.route('/readyz')
 @limiter.exempt
-def health_readiness():
+def health_readiness() -> t.Tuple[str, int]:
     """
     Kubernetes readiness probe endpoint.
 
     This endpoint is used by Kubernetes to determine if the container is ready to
-    receive traffic. The endpoint will return a 200 if the container is ready and
-    the Kubernetes API is available.
+    receive traffic. The endpoint will return a tuple containing a string and an
+    HTTP status code.
 
-    :return: A string indicating that the container is ready.
-    :rtype: str
+    :return: A tuple containing a string indicating that the container is ready
+             and an HTTP status code.
+    :rtype: Tuple[str, int]
     """
     return "I am ready!", 200
 

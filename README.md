@@ -7,7 +7,7 @@
 
 ## Overview
 
-The first question you might have is what is the purpose of this project?  As Kubernetes has become 
+The first question you might have is what is the purpose of this project?  As Kubernetes has become the de facto application hosting platform, not all components of an application are hosted on Kubernetes clusters.  This means a secure method is require for authenticating between these components. 
 
 ## Get started
 

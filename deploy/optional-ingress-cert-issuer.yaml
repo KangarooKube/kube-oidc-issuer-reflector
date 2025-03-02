@@ -13,7 +13,7 @@ metadata:
   name: cloudflare-issuer
 spec:
   acme:
-    email: $ISSUER_EMAIL
+    email: $CERT_ISSUER_EMAIL
     server: https://acme-v02.api.letsencrypt.org/directory
     privateKeySecretRef:
       name: cloudflare-issuer-account-key
@@ -24,4 +24,3 @@ spec:
           apiTokenSecretRef:
             name: cloudflare-api-key-secret
             key: api-key
----
