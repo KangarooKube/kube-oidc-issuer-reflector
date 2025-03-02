@@ -53,6 +53,7 @@ spec:
       labels:
         app: kube-oidc-issuer-reflector
     spec:
+      serviceAccountName: kube-oidc-issuer-reflector
       containers:
       - name: kube-oidc-issuer-reflector
         image: ghcr.io/kangarookube/kube-oidc-issuer-reflector:latest
@@ -62,6 +63,7 @@ spec:
           requests:
             memory: "128Mi"
             cpu: "250m"
+            ephemeral-storage: "10Mi"
           limits:
             memory: "512Mi"
             cpu: "500m"
@@ -125,7 +127,6 @@ spec:
               name: kube-oidc-issuer-reflector
               port:
                 number: 80
-
   tls:
     - hosts:
         - $OIDC_ISSUER_FQDN
