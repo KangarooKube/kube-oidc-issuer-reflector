@@ -3,7 +3,7 @@ import datetime
 import logging
 import sys
 import json_log_formatter
-
+loglevel = os.environ.get('LOG_LEVEL', 'INFO')
 workers = int(os.environ.get('GUNICORN_PROCESSES', '2'))
 threads = int(os.environ.get('GUNICORN_THREADS', '4'))
 timeout = int(os.environ.get('GUNICORN_TIMEOUT', '120'))
