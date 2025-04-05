@@ -3,7 +3,7 @@ import datetime
 import logging
 import sys
 import json_log_formatter
-loglevel = os.environ.get('LOG_LEVEL', 'INFO')
+loglevel = os.environ.get('LOG_LEVEL', 'INFO').upper()
 workers = int(os.environ.get('GUNICORN_PROCESSES', '2'))
 threads = int(os.environ.get('GUNICORN_THREADS', '4'))
 timeout = int(os.environ.get('GUNICORN_TIMEOUT', '120'))
@@ -97,15 +97,15 @@ logconfig_dict = {
             "formatter": "json_error",
         },
     },
-    "root": {"level": "INFO", "handlers": []},
+    "root": {"level": loglevel, "handlers": []},
     "loggers": {
         "gunicorn.access": {
-            "level": "INFO",
+            "level": loglevel,
             "handlers": ["json_request"],
             "propagate": False,
         },
         "gunicorn.error": {
-            "level": "INFO",
+            "level": loglevel,
             "handlers": ["json_error"],
             "propagate": False,
         },
