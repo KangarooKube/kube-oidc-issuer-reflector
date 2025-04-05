@@ -1,6 +1,6 @@
 import os
 import traceback
-from flask import Flask, jsonify
+from flask import Flask, jsonify, request
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 from flask_wtf.csrf import CSRFProtect
@@ -141,6 +141,17 @@ def get_openid_configuration() -> t.Tuple[str, int]:
         Tuple[str, int]: A tuple containing the JSON response of the OIDC discovery document and
                          the HTTP status code.
     """
+    # Log the incoming request at the debug level
+    if app.logger.level == logging.DEBUG:
+        app.logger.debug("Incoming request: method={} path={} headers={}".format(
+            request.method, request.path, dict(request.headers)))
+
+    # Retrieve the allowed User-Agent from environment variables
+    allowed_user_agent = os.environ.get('ALLOWED_USER_AGENT')
+    if allowed_user_agent and request.headers.get('User-Agent') != allowed_user_agent:
+        # If the User-Agent does not match the allowed value, return a 403 error
+        return "Forbidden", 403
+
     try:
         # Get an instance of the WellKnown API client
         k8s_client: client.WellKnownApi = get_k8s_client().WellKnownApi()
@@ -170,6 +181,17 @@ def get_jwks() -> t.Tuple[str, int]:
     Returns:
         Tuple[str, int]: A tuple containing the JSON response of the JWKS document and the HTTP status code.
     """
+    # Log the incoming request at the debug level
+    if app.logger.level == logging.DEBUG:
+        app.logger.debug("Incoming request: method={} path={} headers={}".format(
+            request.method, request.path, dict(request.headers)))
+
+    # Retrieve the allowed User-Agent from environment variables
+    allowed_user_agent = os.environ.get('ALLOWED_USER_AGENT')
+    if allowed_user_agent and request.headers.get('User-Agent') != allowed_user_agent:
+        # If the User-Agent does not match the allowed value, return a 403 error
+        return "Forbidden", 403
+
     # Try to get the JWKS document from the Kubernetes API server
     try:
         # Get an instance of the OpenID API client
