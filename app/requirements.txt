@@ -1,5 +1,5 @@
 kubernetes==32.0.1
-Flask==3.1.0
+Flask==3.1.1
 gunicorn==23.0.0
 json_log_formatter==1.1.1
 flask_limiter==3.12
