@@ -1,4 +1,4 @@
-FROM python:3.11-alpine
+FROM python:3.12-alpine
 
 ARG USER_NAME=containeruser
 ARG USER_UID=1000
