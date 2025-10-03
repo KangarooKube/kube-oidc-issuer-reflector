@@ -1,4 +1,4 @@
-FROM registry.access.redhat.com/ubi9/ubi-minimal
+FROM registry.access.redhat.com/ubi10/ubi-minimal
 
 ARG USER_NAME=containeruser
 ARG USER_UID=1000
