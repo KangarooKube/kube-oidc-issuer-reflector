@@ -5,8 +5,8 @@ ARG USER_UID=1000
 ARG USER_GID=$USER_UID
 ARG GROUP_NAME=$USER_NAME
 
-# Install Python 3 and pip
-RUN microdnf install -y python3 python3-pip \
+# Install Python 3, pip, and shadow-utils (for useradd/groupadd)
+RUN microdnf install -y python3 python3-pip shadow-utils \
     && microdnf clean all
 
 COPY app /app
