@@ -11,8 +11,8 @@ on:
 env:
   # Use docker.io for Docker Hub if empty
   REGISTRY: ghcr.io
-  # github.repository as <account>/<repo>
-  IMAGE_NAME: ${{ github.repository }}
+  # github.repository as <account>/<repo> lowered
+  IMAGE_NAME: ${{ toLower(github.repository) }}
 
 jobs:
   build:
@@ -72,13 +72,13 @@ jobs:
         id: image-build-for-security-scan
         uses: docker/build-push-action@v6
         with:
-          tags: ${{ github.repository }}
+          tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
           labels: ${{ steps.image-metadata.outputs.labels }}
           platforms: linux/amd64
           push: false
           load: true
-          cache-from: type=registry,ref=ghcr.io/${{ github.repository }}:buildcache
-          cache-to: type=registry,ref=ghcr.io/${{ github.repository }}:buildcache,mode=max
+          cache-from: type=registry,ref=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:buildcache
+          cache-to: type=registry,ref=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:buildcache,mode=max
 
       - name: List Docker images
         run: docker images
@@ -89,7 +89,7 @@ jobs:
         uses: aquasecurity/trivy-action@0.33.1
         with:
           github-pat: ${{ secrets.GITHUB_TOKEN }}
-          image-ref: ${{ github.repository }}
+          image-ref: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
           version: 'latest'
           exit-code: '1'
           ignore-unfixed: false
@@ -113,7 +113,7 @@ jobs:
           context: .
           tags: ${{ steps.image-metadata.outputs.tags }}
           labels: ${{ steps.image-metadata.outputs.labels }}
-          cache-from: type=registry,ref=ghcr.io/${{ github.repository }}:buildcache
-          cache-to: type=registry,ref=ghcr.io/${{ github.repository }}:buildcache,mode=max
+          cache-from: type=registry,ref=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:buildcache
+          cache-to: type=registry,ref=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:buildcache,mode=max
           platforms: linux/amd64,linux/arm64
           push: true
