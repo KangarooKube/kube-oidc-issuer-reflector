@@ -74,7 +74,7 @@ jobs:
         with:
           tags: ${{ github.repository }}
           labels: ${{ steps.image-metadata.outputs.labels }}
-          platforms: linux/amd64,linux/arm64
+          platforms: linux/amd64
           push: false
           load: true
           cache-from: type=registry,ref=ghcr.io/${{ github.repository }}:buildcache
