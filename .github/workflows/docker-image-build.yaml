@@ -77,14 +77,17 @@ jobs:
           #platforms: linux/amd64,linux/arm64
           push: false
           load: true
-          
+
+      - name: List Docker images
+        run: docker images
+        
       # Local scan image for vulnerabilities 
       - name: Scan image for Vulnerabilities
         id: image-security-scan
         uses: aquasecurity/trivy-action@0.33.1
         with:
           github-pat: ${{ secrets.GITHUB_TOKEN }}
-          image-ref: 'security-scan'
+          image-ref: security-scan:latest
           version: 'latest'
           exit-code: '1'
           ignore-unfixed: false
