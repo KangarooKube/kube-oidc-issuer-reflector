@@ -11,8 +11,6 @@ on:
 env:
   # Use docker.io for Docker Hub if empty
   REGISTRY: ghcr.io
-  # github.repository as <account>/<repo> lowered
-  IMAGE_NAME: ${{ toLower(github.repository) }}
 
 jobs:
   build:
