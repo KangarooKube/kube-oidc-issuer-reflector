@@ -79,7 +79,7 @@ jobs:
       # Local scan image for vulnerabilities 
       - name: Scan image for Vulnerabilities
         id: image-security-scan
-        uses: aquasecurity/trivy-action@v0.33.1
+        uses: aquasecurity/trivy-action@0.33.1
         with:
           image-ref: 'security-scan'
           exit-code: '1'
