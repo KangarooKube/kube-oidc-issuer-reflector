@@ -95,6 +95,7 @@ jobs:
           severity: 'CRITICAL,HIGH'
           format: 'sarif'
           output: 'trivy-results.sarif'
+          debug: true
 
       # Upload scan results
       - name: Upload scan results to GitHub Security tab
