@@ -69,14 +69,16 @@ jobs:
 
       # Build image for scanning local
       - name: Build Docker container
-        id: image-build-security-scan
+        id: image-build-for-security-scan
         uses: docker/build-push-action@v6
         with:
-          tags: security-scan
+          tags: ${{ github.repository }}
           labels: ${{ steps.image-metadata.outputs.labels }}
-          #platforms: linux/amd64,linux/arm64
+          platforms: linux/amd64,linux/arm64
           push: false
           load: true
+          cache-from: type=registry,ref=ghcr.io/${{ github.repository }}:buildcache
+          cache-to: type=registry,ref=ghcr.io/${{ github.repository }}:buildcache,mode=max
 
       - name: List Docker images
         run: docker images
@@ -87,7 +89,7 @@ jobs:
         uses: aquasecurity/trivy-action@0.33.1
         with:
           github-pat: ${{ secrets.GITHUB_TOKEN }}
-          image-ref: security-scan:latest
+          image-ref: ${{ github.repository }}
           version: 'latest'
           exit-code: '1'
           ignore-unfixed: false
@@ -108,7 +110,10 @@ jobs:
       - name: Build Docker and push container
         uses: docker/build-push-action@v6
         with:
+          context: .
           tags: ${{ steps.image-metadata.outputs.tags }}
           labels: ${{ steps.image-metadata.outputs.labels }}
+          cache-from: type=registry,ref=ghcr.io/${{ github.repository }}:buildcache
+          cache-to: type=registry,ref=ghcr.io/${{ github.repository }}:buildcache,mode=max
           platforms: linux/amd64,linux/arm64
           push: true
