@@ -81,7 +81,9 @@ jobs:
         id: image-security-scan
         uses: aquasecurity/trivy-action@0.33.1
         with:
+          github-pat: ${{ secrets.GITHUB_TOKEN }}
           image-ref: 'security-scan'
+          version: 'latest'
           exit-code: '1'
           ignore-unfixed: false
           vuln-type: 'os,library'
