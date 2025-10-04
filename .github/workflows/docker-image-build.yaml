@@ -102,14 +102,14 @@ jobs:
 
       # Upload scan results
       - name: Upload scan results for container to GitHub Security tab
-        uses: github/codeql-action/upload-sarif@v2
+        uses: github/codeql-action/upload-sarif@v3
         if: always()
         with:
           category: 'snyk/container'
           sarif_file: 'snyk-container.sarif'
           
       - name: Upload scan results for python to GitHub Security tab
-        uses: github/codeql-action/upload-sarif@v2
+        uses: github/codeql-action/upload-sarif@v3
         if: always()
         with:
           category: 'snyk/python'
