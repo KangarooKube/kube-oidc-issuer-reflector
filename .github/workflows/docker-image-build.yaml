@@ -91,7 +91,7 @@ jobs:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
         with:
           image: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
-          args: --severity-threshold=critical --sarif-file-output=snyk.sarif
+          args: --severity-threshold=critical --sarif-file-output=snyk-container.sarif --exclude-app-vulns
 
       # Local scan image for vulnerabilities 
       #- name: Scan image for Vulnerabilities
@@ -110,12 +110,12 @@ jobs:
       #    debug: true
 
       # Upload scan results
-      - name: Upload scan results to GitHub Security tab
+      - name: Upload scan results for container to GitHub Security tab
         uses: github/codeql-action/upload-sarif@v2
         if: always()
         with:
           category: 'snyk/container'
-          sarif_file: 'snyk.sarif'
+          sarif_file: 'snyk-container.sarif'
         
       # Build image and push
       - name: Build Docker and push container
