@@ -91,23 +91,14 @@ jobs:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
         with:
           image: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
-          args: --severity-threshold=critical --sarif-file-output=snyk-container.sarif --exclude-app-vulns
+          args: --severity-threshold=high --sarif-file-output=snyk-container.sarif --exclude-app-vulns
 
-      # Local scan image for vulnerabilities 
-      #- name: Scan image for Vulnerabilities
-      #  id: image-security-scan
-      #  uses: aquasecurity/trivy-action@0.33.1
-      #  with:
-      #    github-pat: ${{ secrets.GITHUB_TOKEN }}
-      #    image-ref: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
-      #    version: 'latest'
-      #    exit-code: '1'
-      #    ignore-unfixed: false
-      #    vuln-type: 'os,library'
-      #    severity: 'CRITICAL,HIGH'
-      #    format: 'sarif'
-      #    output: 'trivy-results.sarif'
-      #    debug: true
+      - name: Scan Python with Snyk
+        uses: snyk/actions/python@master
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+        with:
+          args: --severity-threshold=high --sarif-file-output=snyk-python.sarif
 
       # Upload scan results
       - name: Upload scan results for container to GitHub Security tab
@@ -116,6 +107,13 @@ jobs:
         with:
           category: 'snyk/container'
           sarif_file: 'snyk-container.sarif'
+          
+      - name: Upload scan results for python to GitHub Security tab
+        uses: github/codeql-action/upload-sarif@v2
+        if: always()
+        with:
+          category: 'snyk/python'
+          sarif_file: 'snyk-python.sarif'
         
       # Build image and push
       - name: Build Docker and push container
