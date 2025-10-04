@@ -114,6 +114,7 @@ jobs:
         uses: github/codeql-action/upload-sarif@v2
         if: always()
         with:
+          category: 'snyk/container'
           sarif_file: 'snyk.sarif'
         
       # Build image and push
