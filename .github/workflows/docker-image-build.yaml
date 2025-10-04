@@ -98,7 +98,7 @@ jobs:
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
         with:
-          args: --severity-threshold=high --sarif-file-output=snyk-python.sarif
+          args: --severity-threshold=high --sarif-file-output=snyk-python.sarif --all-projects
 
       # Upload scan results
       - name: Upload scan results for container to GitHub Security tab
