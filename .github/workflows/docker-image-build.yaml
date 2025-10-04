@@ -93,13 +93,6 @@ jobs:
           image: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
           args: --severity-threshold=high --sarif-file-output=snyk-container.sarif --exclude-app-vulns
 
-      - name: Scan Python with Snyk
-        uses: snyk/actions/python-3.12@master
-        env:
-          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
-        with:
-          args: --severity-threshold=high --sarif-file-output=snyk-python.sarif --all-projects
-
       # Upload scan results
       - name: Upload scan results for container to GitHub Security tab
         uses: github/codeql-action/upload-sarif@v3
@@ -107,13 +100,6 @@ jobs:
         with:
           category: 'snyk/container'
           sarif_file: 'snyk-container.sarif'
-          
-      - name: Upload scan results for python to GitHub Security tab
-        uses: github/codeql-action/upload-sarif@v3
-        if: always()
-        with:
-          category: 'snyk/python'
-          sarif_file: 'snyk-python.sarif'
         
       # Build image and push
       - name: Build Docker and push container
