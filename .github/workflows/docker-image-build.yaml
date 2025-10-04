@@ -94,7 +94,7 @@ jobs:
           args: --severity-threshold=high --sarif-file-output=snyk-container.sarif --exclude-app-vulns
 
       - name: Scan Python with Snyk
-        uses: snyk/actions/python@master
+        uses: snyk/actions/python-3.12@master
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
         with:
