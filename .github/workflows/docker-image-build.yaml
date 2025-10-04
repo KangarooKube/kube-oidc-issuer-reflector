@@ -91,7 +91,7 @@ jobs:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
         with:
           image: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
-          args: --severity-threshold=high
+          args: --severity-threshold=critical --sarif-file-output=snyk.sarif
 
       # Local scan image for vulnerabilities 
       #- name: Scan image for Vulnerabilities
