@@ -2,7 +2,7 @@ kubernetes==33.1.0
 Flask==3.1.2
 gunicorn==23.0.0
 json_log_formatter==1.1.1
-flask_limiter==3.12
+flask_limiter==4.0.0
 setuptools>=78.1.1
 flask_wtf==1.2.2
 zipp>=3.19.1 # not directly required, pinned by Snyk to avoid a vulnerability
